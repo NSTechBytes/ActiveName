@@ -4,13 +4,12 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using Rainmeter;
 
-namespace ActiveName
+namespace PluginSkinStatus
 {
     internal class Measure
     {
         private string[] skinNames; // Store multiple skin names
-        private List<string> activeSkins; // List of active skin names
-        private int currentIndex = -1; // Index to track which skin to return next
+        private string activeSkinNames; // To store active skin names
         private API api;  // Store an instance of API
 
         internal Measure()
@@ -25,7 +24,7 @@ namespace ActiveName
             string skinSectionParam = api.ReadString("SkinSection", "");  // Read the skin names
             if (string.IsNullOrEmpty(skinSectionParam))
             {
-                api.Log(API.LogType.Error, "ActiveName.dll: SkinSection parameter is not specified or empty.");
+                api.Log(API.LogType.Error, "PluginSkinStatus.dll: SkinSection parameter is not specified or empty.");
                 return;
             }
 
@@ -34,7 +33,7 @@ namespace ActiveName
 
             if (skinNames.Length == 0)
             {
-                api.Log(API.LogType.Error, "ActiveName.dll: No valid skin names provided.");
+                api.Log(API.LogType.Error, "PluginSkinStatus.dll: No valid skin names provided.");
             }
         }
 
@@ -47,7 +46,7 @@ namespace ActiveName
             // Ensure the file exists
             if (!File.Exists(iniFilePath))
             {
-                api.Log(API.LogType.Error, "ActiveName.dll: Rainmeter.ini file not found.");
+                api.Log(API.LogType.Error, "PluginSkinStatus.dll: Rainmeter.ini file not found.");
                 return new List<string>();
             }
 
@@ -60,7 +59,7 @@ namespace ActiveName
             // Check each specified skin name
             foreach (string skinName in skinNames)
             {
-                string targetHeader = $"[{skinName.Trim()}\\Main]"; // Automatically add \Main to each skin name
+                string targetHeader = $"[{skinName.Trim()}\\Main]"; // Automatically add \Main
                 bool sectionFound = false;
 
                 foreach (string line in lines)
@@ -98,38 +97,19 @@ namespace ActiveName
         internal double Update()
         {
             // Get the active skin sections
-            activeSkins = GetActiveSections();
+            List<string> activeSections = GetActiveSections();
 
-            // Increment the index to return the next active skin name
-            if (activeSkins.Count > 0)
-            {
-                currentIndex++;
+            // Save the active skin names as a |-separated string
+            activeSkinNames = string.Join("|", activeSections);
 
-                // Reset to the first skin if we've gone through all active skins
-                if (currentIndex >= activeSkins.Count)
-                {
-                    currentIndex = 0;
-                }
-
-                // Return the active skin name one by one
-                string activeSkin = activeSkins[currentIndex];
-                api.Log(API.LogType.Debug, $"ActiveName.dll: Active skin: {activeSkin}"); // Updated logging level
-                return currentIndex; // Return index to allow Rainmeter to request the next skin
-            }
-
-            // No active skins found, reset the index
-            currentIndex = -1;
-            return -1; // Indicate no active skins
+            // This method now doesn't return a numeric value
+            return 0; // Placeholder since numeric output is no longer needed
         }
 
-        // Called by Rainmeter to retrieve a string value (for the current active skin name)
+        // Called by Rainmeter to retrieve a string value
         internal string GetString()
         {
-            if (currentIndex >= 0 && currentIndex < activeSkins.Count)
-            {
-                return activeSkins[currentIndex]; // Return the current active skin name
-            }
-            return string.Empty; // No active skin available
+            return activeSkinNames; // Return the active skin names
         }
     }
 
