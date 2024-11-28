@@ -24,6 +24,8 @@
    Measure=Plugin
    Plugin=ActiveName.dll
    SkinSection=ModernSearchBar|MiniAlarm
+   ;only available in version 1.1
+   OnFirstCheckAction=[!Log "Checking skins for the first time"]
    ```
 
    Replace `ModernSearchBar|MiniAlarm` with the names of the skins you want to monitor.
@@ -48,6 +50,8 @@
 Measure=Plugin
 Plugin=ActiveName.dll
 SkinSection=ModernSearchBar|MiniAlarm
+;only available in version 1.1
+ OnFirstCheckAction=[!Log "Checking skins for the first time"]
 ```
 
 - This will return the names of all active skins in `ModernSearchBar` and `MiniAlarm`, and update accordingly.
