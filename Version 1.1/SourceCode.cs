@@ -7,7 +7,7 @@ using Rainmeter;
 namespace PluginSkinStatus
 {
     internal class Measure
-    { 
+    {
         private string[] skinNames; // Store multiple skin names
         private string activeSkinNames; // To store active skin names
         private API api;  // Store an instance of API
@@ -100,7 +100,13 @@ namespace PluginSkinStatus
         // Called by Rainmeter to update the measure
         internal double Update()
         {
-            // On first check, execute OnFirstCheckAction
+            // Get the active skin sections
+            List<string> activeSections = GetActiveSections();
+
+            // Save the active skin names as a |-separated string
+            activeSkinNames = string.Join("|", activeSections);
+
+            // On first check, execute OnFirstCheckAction after setting activeSkinNames
             if (isFirstCheck)
             {
                 string onFirstCheckAction = api.ReadString("OnFirstCheckAction", "");
@@ -111,12 +117,6 @@ namespace PluginSkinStatus
                 }
                 isFirstCheck = false; // Reset the flag after the first execution
             }
-
-            // Get the active skin sections
-            List<string> activeSections = GetActiveSections();
-
-            // Save the active skin names as a |-separated string
-            activeSkinNames = string.Join("|", activeSections);
 
             return 0; // Placeholder since numeric output is no longer needed
         }
